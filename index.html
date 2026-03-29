@@ -6,12 +6,14 @@
   <title>kinotos</title>
   <style>
     :root {
-      --bg: #0a0a0a;
-      --surface: #111111;
-      --border: #1e1e1e;
-      --text: #e8e8e8;
-      --muted: #555;
-      --accent-dim: rgba(232, 232, 232, 0.06);
+      --bg: #0d0c0b;
+      --surface: #131210;
+      --border: #252320;
+      --text: #ddd8cf;
+      --muted: #5a5650;
+      --accent: #8faab3;
+      --accent-dim: rgba(143, 170, 179, 0.07);
+      --rose: #c4908a;
     }
 
     *, *::before, *::after {
@@ -30,6 +32,18 @@
       line-height: 1.6;
       overflow-x: hidden;
       cursor: none;
+    }
+
+    /* Grain texture */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9990;
+      mix-blend-mode: overlay;
+      opacity: 0.6;
     }
 
     /* Cursor */
@@ -111,8 +125,9 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse 70% 50% at 65% 45%, rgba(255,255,255,0.025) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 40% at 15% 75%, rgba(255,255,255,0.015) 0%, transparent 60%);
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(143,170,179,0.06) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 20% 80%, rgba(196,144,138,0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 40% at 80% 70%, rgba(143,170,179,0.03) 0%, transparent 55%);
     }
     .hero-content { position: relative; }
     .hero-eyebrow {
@@ -255,6 +270,10 @@
       transform: translateY(0);
     }
     .interest-card:hover { background: var(--surface); }
+    .interest-card:nth-child(1) { border-top: 1px solid var(--accent); }
+    .interest-card:nth-child(2) { border-top: 1px solid var(--rose); }
+    .interest-card:nth-child(3) { border-top: 1px solid var(--accent); }
+    .interest-card:nth-child(4) { border-top: 1px solid var(--rose); }
     .interest-icon {
       font-size: 28px;
       margin-bottom: 24px;
@@ -457,15 +476,14 @@
     }
     .footer-links a:hover { color: var(--text); }
 
-    /* Noise */
+    /* Vignette */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(10,9,8,0.5) 100%);
       pointer-events: none;
-      z-index: 9997;
-      opacity: 0.4;
+      z-index: 9991;
     }
 
     /* Animations */
@@ -520,9 +538,8 @@
       <h1 class="hero-name">kinotos</h1>
       <p class="hero-concept">
         <strong>感性を、定量化する。</strong><br>
-        サウナの心地よさ、音楽の没入感、<br>
-        コーヒーの複雑さ、クラフトビールの奥行き。<br>
-        すべての体験に、数字が宿っている。
+        夢のような体験の輪郭を、<br>
+        静かに数字で描いていく。
       </p>
     </div>
     <div class="hero-scroll">
