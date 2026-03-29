@@ -37,9 +37,7 @@
     .petal {
       position: absolute;
       top: -80px;
-      border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
       opacity: 0;
-      animation: petfall linear infinite;
     }
     @keyframes petfall {
       0%   { transform: translateY(0) rotate(0deg) translateX(0);   opacity: 0; }
@@ -515,8 +513,7 @@
       left: ${Math.random() * 105}%;
       width: ${size}px; height: ${size * (.6 + Math.random() * .6)}px;
       background: ${colors[Math.floor(Math.random() * colors.length)]};
-      animation-duration: ${dur}s;
-      animation-delay: ${delay}s;
+      animation: petfall ${dur}s ${delay}s linear infinite;
       border-radius: ${50+Math.random()*20}% ${40+Math.random()*20}% ${55+Math.random()*15}% ${45+Math.random()*15}% / ${50+Math.random()*20}% ${60+Math.random()*15}% ${40+Math.random()*20}% ${50+Math.random()*20}%;
     `;
     field.appendChild(p);
