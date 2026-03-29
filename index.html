@@ -42,23 +42,26 @@
     /* cursor */
     .cur {
       position: fixed;
-      width: 7px; height: 7px;
+      width: 6px; height: 6px;
       background: var(--text);
       border-radius: 50%;
       pointer-events: none;
       z-index: 9999;
       transform: translate(-50%,-50%);
+      transition: width .4s cubic-bezier(.16,1,.3,1), height .4s cubic-bezier(.16,1,.3,1), opacity .3s ease;
     }
+    .cur.hovering { width: 0; height: 0; opacity: 0; }
     .cur-ring {
       position: fixed;
-      width: 30px; height: 30px;
-      border: 1px solid rgba(28,24,20,0.2);
+      width: 28px; height: 28px;
+      border: 1px solid rgba(28,24,20,0.18);
       border-radius: 50%;
       pointer-events: none;
       z-index: 9998;
       transform: translate(-50%,-50%);
-      transition: width .3s ease, height .3s ease;
+      transition: width .6s cubic-bezier(.16,1,.3,1), height .6s cubic-bezier(.16,1,.3,1), border-color .4s ease;
     }
+    .cur-ring.hovering { width: 60px; height: 60px; border-color: rgba(28,24,20,0.3); }
     body:has(a:hover) .cur-ring { width: 44px; height: 44px; }
 
     /* nav */
@@ -230,8 +233,8 @@
       padding: 56px 40px 56px;
       border-right: 1px solid var(--line);
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity .7s ease, transform .7s ease, background .35s;
+      transform: translateY(36px);
+      transition: opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1), background .5s ease;
     }
     .int:last-child { border-right: none; }
     .int.on { opacity: 1; transform: none; }
@@ -339,13 +342,19 @@
       padding: 40px;
       border-right: 1px solid var(--line);
       opacity: 0;
-      transform: translateY(16px);
-      transition: opacity .7s, transform .7s, background .35s;
+      transform: translateY(36px);
+      transition: opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1), background .5s ease;
+      overflow: hidden;
     }
     .wk:last-child { border-right: none; }
     .wk.on { opacity: 1; transform: none; }
     .wk:hover { background: var(--bg2); }
     .wk-img {
+      width: 100%;
+      transition: transform .8s cubic-bezier(.16,1,.3,1);
+    }
+    .wk:hover .wk-img { transform: scale(1.02); }
+    .wk-img-inner {
       width: 100%;
       aspect-ratio: 4/3;
       background: var(--line);
@@ -580,31 +589,66 @@
 </div>
 
 <script>
-  // cursor
-  const cur = document.getElementById('cur');
+  // ── Cursor ──────────────────────────────────────────────
+  const cur  = document.getElementById('cur');
   const ring = document.getElementById('ring');
-  let mx=0,my=0,rx=0,ry=0;
+  let mx=0, my=0, rx=0, ry=0;
+
   document.addEventListener('mousemove', e => {
-    mx=e.clientX; my=e.clientY;
-    cur.style.left=mx+'px'; cur.style.top=my+'px';
+    mx = e.clientX; my = e.clientY;
+    cur.style.left = mx+'px'; cur.style.top = my+'px';
   });
+
+  // ring follows with lag (lerp factor 0.08 = very smooth)
   (function loop(){
-    rx+=(mx-rx)*.1; ry+=(my-ry)*.1;
-    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    rx += (mx - rx) * 0.08;
+    ry += (my - ry) * 0.08;
+    ring.style.left = rx+'px';
+    ring.style.top  = ry+'px';
     requestAnimationFrame(loop);
   })();
 
-  // reveal
-  const els = document.querySelectorAll('.int,.w-item,.wk:not(.on)');
-  const obs = new IntersectionObserver(entries=>{
-    entries.forEach((e,i)=>{
-      if(e.isIntersecting){
-        setTimeout(()=>e.target.classList.add('on'), i*80);
-        obs.unobserve(e.target);
-      }
+  // expand ring on hoverable elements
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cur.classList.add('hovering');
+      ring.classList.add('hovering');
     });
-  },{threshold:.05});
-  els.forEach(el=>obs.observe(el));
+    el.addEventListener('mouseleave', () => {
+      cur.classList.remove('hovering');
+      ring.classList.remove('hovering');
+    });
+  });
+
+  // ── Scroll reveal ────────────────────────────────────────
+  // Stagger siblings in the same parent grid
+  const groups = {};
+  document.querySelectorAll('.int, .w-item, .wk:not(.on)').forEach(el => {
+    const key = el.parentElement;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(el);
+  });
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const siblings = groups[entry.target.parentElement] || [entry.target];
+      siblings.forEach((el, i) => {
+        setTimeout(() => el.classList.add('on'), i * 120);
+      });
+      // unobserve whole group
+      siblings.forEach(el => obs.unobserve(el));
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  Object.values(groups).forEach(group => obs.observe(group[0]));
+
+  // ── Parallax on hero name ────────────────────────────────
+  const heroName = document.querySelector('.hero-name');
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (heroName) heroName.style.transform = `translateY(${y * 0.18}px)`;
+  }, { passive: true });
 </script>
 </body>
 </html>
